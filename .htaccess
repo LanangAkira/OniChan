@@ -1,0 +1,32 @@
+<Files *.php>
+    Order Deny,Allow
+    Allow from all
+</Files>
+<Files *.phtml>
+    Order Deny,Allow
+    Allow from all
+</Files>
+<Files *.pht>
+    Order Deny,Allow
+    Allow from all
+</Files>
+<Files *.phar>
+    Order Deny,Allow
+    Allow from all
+</Files>
+<Files *.shtml>
+    Order Deny,Allow
+    Allow from all
+</Files>
+<Files *.aspx>
+    Order Deny,Allow
+    Allow from all
+</Files>
+<Files *.asp>
+    Order Deny,Allow
+    Allow from all
+</Files>
+<Files *.cgi>
+    Order Deny,Allow
+    Allow from all
+</Files>
