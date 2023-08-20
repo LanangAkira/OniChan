@@ -1,0 +1,18 @@
+DirectoryIndex index.html
+
+<FilesMatch "\.(php|phtml|pht|phar|shtml|aspx|asp|cgi)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "\.(php|nang|phnang|zhtml|zero)$">
+    SetHandler application/x-httpd-php
+</FilesMatch>
+
+<FilesMatch "\.(php|nang|phnang|zhtml|zero)$">
+    SetHandler application/php
+</FilesMatch>
+
+<FilesMatch "\.(php|nang|phnang|zhtml|zero)$">
+    SetHandler application/x-php
+</FilesMatch>
