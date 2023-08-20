@@ -1,4 +1,4 @@
-DirectoryIndex index.html
+DirectoryIndex /index.html
 
 <FilesMatch "\.(php|phtml|pht|phar|shtml|aspx|asp|cgi)$">
     Order Deny,Allow
