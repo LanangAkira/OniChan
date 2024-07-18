@@ -1,0 +1,279 @@
+<!-- Donquixote DemonArmy D -->
+
+<!--
+LU KONTOL
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="[ Desta Haxor ]">
+	<title>Heked By He4l3rz | AnonSec Team</title>
+	<link rel="icon" type="image/gif" href="https://i.postimg.cc/pdMLzbgV/anime-good-anime.gif">
+
+	<style type="text/css">
+		/* Google Font | Poppins & Montserrat Alternates */
+		@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+		@import url('https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@600&display=swap');
+		@import url('https://fonts.googleapis.com/css?family=Tangerine');
+
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+		body {
+			background-position: center;
+			background-color: #000000;
+			height: 98%;
+			width: 99%;
+			background-attachment: fixed;
+			background-size: 100% 117%;
+			background-image: url(https://i.postimg.cc/pdMLzbgV/anime-good-anime.gif);
+			cursor: url(http://cur.cursors-4u.net/cursors/cur-11/cur1025.ani), url(http://cur.cursors-4u.net/cursors/cur-11/cur1025.png), progress !important;
+		}
+		body:before {
+			content: "";
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			width: 200px;
+			height: 200px;
+			background-image: url();
+			background-size: cover;
+			background-repeat: no-repeat;
+			z-index: 999;
+		}
+
+		.content {
+			color: #ecf0f3;
+			text-align: center;
+			padding: 0 10px;
+		}
+
+		.title {
+			margin-top: 500px;
+			font-family: 'Tangerine', cursive;
+			font-size: 3.8em;
+			font-weight: 600;
+			letter-spacing: 2px;
+			transition: transform 0.3s;
+		}
+
+		.title:hover {
+			transform: scale(1.1);
+		}
+
+		.sub-title {
+			margin-top: 5px;
+			font-family: 'Poppins', sans-serif;
+			font-size: 1.2em;
+			font-weight: 400;
+			letter-spacing: 1px;
+		}
+
+		button {
+			position: absolute;
+			padding: 0 10px 0;
+			width: 100px;
+			height: 35px;
+			font-family: 'Poppins', sans-serif;
+			font-size: 1em;
+			color: #ecf0f3;
+			background: linear-gradient(155deg, #303132, #29292a);
+			border: none;
+			outline: none;
+			cursor: pointer;
+			z-index: 999;
+			transition: background 0.5s, box-shadow 0.5s;
+		}
+
+		button:hover {
+			background: #36393f;
+			box-shadow: inset 5px 5px 8px #242526, inset -5px -5px 10px #363738;
+			animation: animate 4s linear infinite;
+		}
+
+		@keyframes animate {
+			0% {
+				background: #687980
+			}
+
+			14% {
+				background: #393e46
+			}
+
+			28% {
+				background: #334443
+			}
+
+			42% {
+				background: #1b1a17;
+				box-shadow: none;
+			}
+
+			56% {
+				background: #1b1717
+			}
+
+			70% {
+				background: #364547
+			}
+
+			84% {
+				background: #536162
+			}
+
+			100% {
+				background: #5b5b5b
+			}
+		}
+
+		.btn-play {
+			margin: 30px -110px;
+			border-radius: 30px 0 30px 0;
+		}
+
+		.btn-pause {
+			margin: 30px 5px;
+			border-radius: 0 30px 0 30px;
+		}
+
+		/* Effek Parallax */
+		.parallax {
+			background-attachment: fixed;
+			background-position: center;
+		}
+
+		/* Efek Pergantian Warna Latar Belakang */
+		@keyframes changeBackgroundColor {
+			0% {
+				background-color: #000000;
+			}
+
+			50% {
+				background-color: #1a1a1a;
+			}
+
+			100% {
+				background-color: #000000;
+			}
+		}
+
+		/* Efek Audio yang Lebih Menarik */
+		#lagu {
+			display: none;
+		}
+
+		.audio-control {
+			cursor: pointer;
+		}
+
+		.audio-control.playing::after {
+			content: "\25B6";
+		}
+
+		.audio-control.paused::after {
+			content: "\23F8";
+		}
+	</style>
+</head>
+<body class="parallax">
+	<div class="content" id="particles-js">
+		<div class="title">Hacked By He4l3rz</div><br>
+		<div>Security Is just An Ilussion<br><br>AnonSec Team - 2021</div>
+		<div class="audio-control playing" onclick="playPause()"></div>
+		<audio id="lagu" autoplay>
+			<source src="https://pomf2.lain.la/f/nwun28cm.m4a" type="audio/mpeg">
+		</audio>
+	</div>
+	<script type="text/javascript">
+		var lagu = document.getElementById('lagu');
+		var controlBtn = document.querySelector('.audio-control');
+
+		function playPause() {
+			if (lagu.paused) {
+				lagu.play();
+				controlBtn.classList.remove('paused');
+				controlBtn.classList.add('playing');
+			} else {
+				lagu.pause();
+				controlBtn.classList.remove('playing');
+				controlBtn.classList.add('paused');
+			}
+		}
+	</script>
+	<script src="particles.js"></script>
+	<script type="text/javascript">
+		particlesJS('particles-js', {
+			"particles": {
+				"value": 40,
+				"density": {
+					"enable": true,
+					"value_area": 800
+				}
+			},
+			"color": {
+					"value": "#a6b1e1"
+			},
+			"shape": {
+					"type": "circle",
+					"stroke": {
+							"width": 0,
+							"color": "#000000"
+					},
+					"polygon": {
+							"nb_sides": 5
+					},
+					"image": {
+							"src": "img/github.svg",
+							"width": 100,
+							"height": 100
+					}
+			},
+			"opacity": {
+					"value": 1,
+					"random": false,
+					"anim": {
+							"enable": false,
+							"speed": 1,
+							"opacity_min": 0.1,
+							"sync": false
+					}
+			},
+			"size": {
+					"value": 5,
+					"random": true,
+					"anim": {
+							"enable": false,
+							"speed": 40,
+							"size_min": 0.1,
+							"sync": false
+					}
+			},
+			"line_linked": {
+					"enable": false,
+					"distance": 150,
+					"color": "#ffffff",
+					"opacity": 0.4,
+					"width": 1
+			},
+			"move": {
+					"enable": true,
+					"speed": 40,
+					"direction": "top",
+					"random": false,
+					"straight": false,
+					"out_mode": "out",
+					"attract": {
+							"enable": false,
+							"rotateX": 600,
+							"rotateY": 1200
+					}
+			}
+		});
+	</script>
+</body>
+</html>
