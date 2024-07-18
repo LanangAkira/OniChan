@@ -9,7 +9,7 @@ LU KONTOL
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta name="description" content="[ Desta Haxor ]">
+	<meta name="description" content="[ AnonSec Team ]">
 	<title>Heked By He4l3rz | AnonSec Team</title>
 	<link rel="icon" type="image/gif" href="https://i.postimg.cc/pdMLzbgV/anime-good-anime.gif">
 
