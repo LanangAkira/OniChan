@@ -233,7 +233,7 @@
                 $content = file_get_contents($fileToEdit);
                 echo '<h3>Edit File: ' . htmlspecialchars($fileToEdit) . '</h3>';
                 echo '<form method="POST">';
-                echo '<textarea name="content" rows="20" cols="105"' . htmlspecialchars($content) . '</textarea><br>';
+                echo '<textarea name="content" rows="20" cols="105">' . htmlspecialchars($content) . '</textarea><br>';
                 echo '<input type="hidden" name="filename" value="' . htmlspecialchars($fileToEdit) . '">';
                 echo '<button type="submit" name="save">Save</button>';
                 echo '</form>';
