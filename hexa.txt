@@ -232,7 +232,7 @@
             // Tetap berada di halaman edit setelah menyimpan
             $dir = dirname($fileToSave);
             header("Location: ?dir=" . urlencode($dir) . "&edit=" . urlencode($fileToSave));
-            exit;
+            
         }
         // Krit dir
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_dir'])) {
