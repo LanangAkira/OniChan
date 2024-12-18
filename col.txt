@@ -1,0 +1,32 @@
+<?php
+// User-Agent
+$userAgent = $_SERVER['HTTP_USER_AGENT'];
+
+// User-Agent mobile
+$mobileAgents = [
+    'Android', 'iPhone', 'iPad', 'iPod', 'BlackBerry', 
+    'Windows Phone', 'Opera Mini', 'IEMobile', 'Mobile'
+];
+
+// desktop
+$isMobile = false;
+
+// User-Agent mobile
+foreach ($mobileAgents as $mobileAgent) {
+    if (strpos($userAgent, $mobileAgent) !== false) {
+        $isMobile = true;
+        break;
+    }
+}
+
+// konten perangkat
+if ($isMobile) {
+    // mobile
+    $konten = file_get_contents('mobile.html');
+    echo $konten;
+} else {
+    // desktop
+    $konten = file_get_contents('pc.html');
+    echo $konten;
+}
+?>
